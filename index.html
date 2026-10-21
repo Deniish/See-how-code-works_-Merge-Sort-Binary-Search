@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>See how code works: Merge Sort &amp; Binary Search</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:#222;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header,main{max-width:1200px;margin:0 auto;padding:0 20px}
+header{padding-top:20px}
+h1{font-size:24px;margin:0 0 4px}
+header p{margin:0;color:#555}
+main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;padding-top:16px;padding-bottom:30px}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.box{border:2px solid #222;border-radius:8px;background:#fff}
+.title{font-weight:700;padding:8px 12px;border-bottom:2px solid #222;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.title span{flex:1}
+button,select{font:inherit;font-weight:600;background:#fff;color:#222;border:2px solid #222;border-radius:6px;padding:5px 12px;cursor:pointer}
+button.blue{background:#1a73e8;border-color:#1a73e8;color:#fff}
+button.green{background:#2e9e44;border-color:#2e9e44;color:#fff}
+button:disabled{opacity:.35;cursor:default}
+.ed{height:400px;position:relative;overflow:hidden;display:flex}
+#gut{width:44px;flex:none;background:#f1f1f1;border-right:1px solid #ccc;color:#888;text-align:right;padding:10px 8px 10px 0;overflow:hidden;font:14px/22px ui-monospace,Menlo,Consolas,monospace;white-space:pre}
+#src{flex:1;min-width:0;height:100%;border:0;outline:none;resize:none;padding:10px 12px;font:14px/22px ui-monospace,Menlo,Consolas,monospace;color:#222;background:#fff;white-space:pre;overflow:auto;tab-size:2}
+#view{position:absolute;inset:0;overflow:auto;background:#fff;padding:10px 0;font:14px/22px ui-monospace,Menlo,Consolas,monospace}
+.ln{display:flex;white-space:pre;height:22px;padding-right:12px}
+.ln i{width:44px;flex:none;text-align:right;padding-right:10px;color:#888;font-style:normal}
+.ln.on{background:#fff176;font-weight:700}
+.note{padding:8px 12px;border-top:1px solid #ccc;color:#555;font-size:14px}
+#say{padding:12px 14px;font-size:20px;font-weight:700;height:92px;overflow:auto;border-bottom:2px solid #222}
+#say small{display:block;font-size:13px;font-weight:400;color:#555;font-family:ui-monospace,Menlo,monospace;margin-top:2px}
+#stage{height:440px;display:flex;flex-direction:column;background:#fff}
+#tree{height:228px;overflow:auto;padding:8px 10px;border-bottom:2px dashed #bbb;flex:none}
+#detail{flex:1;overflow:auto;padding:8px 12px}
+.lab{font-size:13px;color:#555;margin-bottom:6px;font-weight:600}
+.tr0{width:max-content;margin:0 auto;display:flex;gap:10px}
+.nd{display:flex;flex-direction:column;align-items:center}
+.kids{display:flex;gap:12px;margin-top:12px}
+.kids>.nd{position:relative}
+.kids>.nd::before{content:"";position:absolute;top:-12px;left:50%;width:2px;height:12px;background:#999}
+.nb{display:flex;gap:2px;border:2px solid #bbb;border-radius:6px;padding:2px;background:#fff}
+.nb.act{border-color:#1a73e8}
+.nb.done{border-color:#2e9e44;background:#d7f5dd}
+.nb span{min-width:24px;text-align:center;font:700 14px ui-monospace,Menlo,monospace;padding:2px 0}
+.c.found b{background:#7bd88f;border-color:#2e9e44}
+.fr{border:1px solid #bbb;border-radius:8px;padding:8px 10px;margin-bottom:10px}
+.fr.top{border:2px solid #1a73e8}
+.fr h3{margin:0 0 6px;font-size:14px;color:#1a73e8;font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+.fr h3 span{color:#666;font-weight:400}
+.an{font-size:13px;color:#555;font-family:ui-monospace,Menlo,monospace;margin-bottom:3px}
+.cells{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.c{width:46px;text-align:center;transition:transform .3s}
+.c b{display:block;border:2px solid #222;border-radius:6px;padding:6px 0;font-size:18px;background:#fff;transition:background .3s,color .3s,border-color .3s}
+.c i{display:block;font-size:11px;color:#888;font-style:normal}
+.c u{display:block;text-decoration:none;font-size:13px;font-weight:700;color:#1a73e8;min-height:18px}
+.c.ptr{transform:translateY(-4px)}
+.c.ptr b{background:#ffd54f}
+.c.dim b{background:#eee;color:#aaa;border-color:#ccc}
+.c.chg b{animation:pop .5s}
+@keyframes pop{0%{background:#7bd88f;transform:scale(1.2)}100%{transform:scale(1)}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid #bbb;border-radius:6px;padding:1px 9px;font:14px ui-monospace,Menlo,monospace}
+.chip em{font-style:normal;color:#666}
+.chip.chg{animation:pop .5s}
+.ctl{display:flex;gap:8px;align-items:center;padding:10px 12px;border-top:2px solid #222;flex-wrap:wrap}
+#scrub{flex:1;min-width:110px;accent-color:#1a73e8}
+#spd{accent-color:#1a73e8}
+.legend{padding:8px 12px;border-top:1px solid #ccc;font-size:14px;color:#444;display:flex;gap:14px;flex-wrap:wrap}
+.legend b{display:inline-block;width:14px;height:14px;border:2px solid #222;border-radius:3px;vertical-align:-2px;margin-right:4px}
+.err{color:#c62828;white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+<h1>See how code works</h1>
+<p>1) Pick an example or type your own code. 2) Press the green button. 3) Press Play and watch each line happen.</p>
+</header>
+<main>
+<section class="box">
+<div class="title"><span>Your code</span>
+<select id="ex"><option value="merge">Example: Merge sort</option><option value="bin">Example: Binary search</option></select></div>
+<div class="ed"><div id="gut"></div><textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Type or paste your code here"></textarea><div id="view" hidden></div></div>
+<div class="ctl" style="border-top:2px solid #222">
+<button class="green" id="run">▶ Run &amp; show me</button>
+<button id="edit" disabled>✎ Edit code</button>
+<button id="clear">Clear</button>
+</div>
+<div class="note">Tip: write <code>function name(…)</code>, one step per line, and call your function at the bottom with your own numbers. Words after <code>//</code> are shown as the explanation.</div>
+</section>
+<section class="box">
+<div id="say">Press the green button to start.</div>
+<div id="stage"><div id="tree"></div><div id="detail"></div></div>
+<div class="legend"><span><b style="background:#ffd54f"></b>being looked at</span><span><b style="background:#eee;border-color:#ccc"></b>ignored for now</span><span><b style="background:#7bd88f"></b>just changed / found / sorted</span></div>
+<div class="ctl">
+<button id="first">⏮ Start</button>
+<button id="prev">◀ Back</button>
+<button class="blue" id="play">▶ Play</button>
+<button id="next">Next ▶</button>
+<input type="range" id="scrub" min="0" max="0" value="0" aria-label="Step">
+<span id="cnt">0 / 0</span>
+<label>Speed <input type="range" id="spd" min="1" max="10" value="3"></label>
+</div>
+</section>
+</main>
+<script>
+const EX={
+merge:`// WHAT THIS CODE DOES: Merge sort puts numbers in order (smallest first).
+// HOW: split the list in halves until each piece is 1 number,
+// then join the pieces back together in order.
+// OUTPUT: [5, 2, 8, 1, 9, 3] becomes [1, 2, 3, 5, 8, 9]
+function mergeSort(list) {
+  if (list.length <= 1) return list; // one number is already sorted
+  const middle = Math.floor(list.length / 2); // find the middle
+  const left = mergeSort(list.slice(0, middle)); // sort the left half
+  const right = mergeSort(list.slice(middle)); // sort the right half
+  return merge(left, right); // join both halves in order
+}
+
+function merge(left, right) {
+  const result = []; // the new sorted list
+  let i = 0; // our place in left
+  let j = 0; // our place in right
+  while (i < left.length && j < right.length) { // until one side runs out
+    if (left[i] <= right[j]) { // which front number is smaller?
+      result.push(left[i]); // left is smaller, take it
+      i++; // move one step right in left
+    } else {
+      result.push(right[j]); // right is smaller, take it
+      j++; // move one step right in right
+    }
+  }
+  return result.concat(left.slice(i), right.slice(j)); // add what is left over
+}
+
+mergeSort([5, 2, 8, 1, 9, 3]); // start with 6 numbers`,
+bin:`// WHAT THIS CODE DOES: Binary search finds where a number is in a SORTED list.
+// HOW: look at the middle, throw away the half that cannot have it, repeat.
+// OUTPUT: 23 is found at position 4 (counting from 0)
+function binarySearch(list, target) {
+  let low = 0; // start of the search area
+  let high = list.length - 1; // end of the search area
+  while (low <= high) { // keep going while there is something to search
+    const mid = Math.floor((low + high) / 2); // look at the middle
+    if (list[mid] === target) { // is the middle the number we want?
+      return mid; // yes, we found it!
+    } else if (list[mid] < target) { // the middle is too small
+      low = mid + 1; // throw away the left side
+    } else { // the middle is too big
+      high = mid - 1; // throw away the right side
+    }
+  }
+  return -1; // it is not in the list
+}
+
+binarySearch([3, 8, 12, 17, 23, 31, 45, 52], 23); // look for 23`};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const strip=l=>l.replace(/\s*\/\/.*$/,'');
+let steps=[],cur=0,timer=null,assoc={},lines=[],nodes=[],rec=new Set();
+function fmt(x){
+  if(Array.isArray(x))return '['+x.slice(0,10).map(fmt).join(', ')+(x.length>10?', …':'')+']';
+  if(typeof x==='string')return JSON.stringify(x);
+  if(typeof x==='function')return 'ƒ';
+  if(x&&typeof x==='object'){try{return JSON.stringify(x)}catch(e){return '{…}'}}
+  return String(x);
+}
+function clone(o){const r={};for(const k in o){const v=o[k];if(typeof v==='function')continue;r[k]=Array.isArray(v)?v.slice(0,40):(v&&typeof v==='object')?fmt(v):v}return r}
+
+function build(src){
+  const L=src.split('\n').map(strip),names=new Set(),fn=new Set(),as={};
+  const O=src.split('\n');
+  L.join('\n').replace(/function\s*([\w$]+)\s*\(([^)]*)\)/g,(m,n,p)=>{fn.add(n);p.split(',').forEach(x=>{x=x.split('=')[0].trim();if(/^[\w$]+$/.test(x))names.add(x)});return m});
+  L.forEach(l=>{const m=l.match(/\b(?:let|const|var)\s+(.*)/);if(m)m[1].split(/;|\bof\b|\bin\b/)[0].replace(/(?:^|,)\s*([A-Za-z_$][\w$]*)\s*(?:=|$)/g,(a,n)=>{names.add(n);return a})});
+  fn.forEach(n=>names.delete(n));
+  L.join('\n').replace(/([A-Za-z_$][\w$]*)\[\s*([A-Za-z_$][\w$]*)(?:\s*[+-]\s*\d+)?\s*\]/g,(m,a,i)=>{if(!as[i])as[i]=a;return m});
+  const g='()=>{const o={};'+[...names].map(n=>`try{o.${n}=${n}}catch(e){}`).join('')+'return o}';
+  const out=[];let prev='';
+  L.forEach((l,i)=>{
+    const t=l.trim();
+    const skip=!t||/^(\/\/|[})\]]|else\b|case\b|default\b|catch\b|finally\b|function\b|[.,+\-*\/%&|?:])/.test(t)||/[,(\[+\-*\/%&|?:=]$/.test(prev)||/^(if|else if|for|while)\b.*\)$/.test(prev)||/^else$/.test(prev);
+    out.push(skip?O[i]:O[i].replace(/^(\s*)/,(m,a)=>a+`__s(${i+1},${g});`));
+    if(t)prev=t;
+  });
+  out[0]=[...fn].map(n=>`${n}=__w(${n},"${n}");`).join('')+out[0];
+  return {code:out.join('\n'),assoc:as};
+}
+function execute(src){
+  const b=build(src);assoc=b.assoc;steps=[];lines=src.split('\n');
+  let count=0;nodes=[];rec=new Set();const nst=[];let fin;const frames=[{name:'start',args:'',vars:{},line:0}];
+  const push=(line,msg)=>steps.push({line,msg,frames:frames.slice(-4).map(f=>({name:f.name,args:f.args,vars:f.vars}))});
+  const __s=(line,get)=>{
+    if(++count>2500)throw new Error('Stopped after 2500 steps. Is there a loop that never ends?');
+    let v={};try{v=get()}catch(e){}
+    const f=frames[frames.length-1];f.vars=clone(v);f.line=line;push(line,'');
+  };
+  const __w=(f,name)=>function(...a){
+    const n={name,parent:nst[nst.length-1]||null,arr:Array.isArray(a[0])?a[0].slice(0,12):null,res:null,start:steps.length,end:1e9,kids:[]};
+    if(n.parent)n.parent.kids.push(n);nodes.push(n);nst.push(n);
+    frames.push({name,args:a.map(fmt).join(', '),vars:{},line:0});
+    let r;try{r=f.apply(this,a)}finally{frames.pop();nst.pop()}
+    n.end=steps.length;n.res=Array.isArray(r)?r.slice(0,12):null;
+    if(frames.length===1)fin=r;
+    push(frames[frames.length-1].line,'Done! '+name+' gives back '+fmt(r));return r;
+  };
+  new Function('__s','__w',b.code)(__s,__w);
+  rec=new Set(nodes.filter(n=>n.parent&&n.parent.name===n.name&&n.arr).map(n=>n.name));
+  push(frames[0].line,'All finished! The answer is '+fmt(fin));
+}
+
+function frameHTML(f,pf,top,ret){
+  const v=f.vars,keys=Object.keys(v),arrs=keys.filter(k=>Array.isArray(v[k])),sc=keys.filter(k=>!Array.isArray(v[k]));
+  const chg=k=>pf&&pf.name===f.name&&JSON.stringify(pf.vars[k])!==JSON.stringify(v[k]);
+  const PT=/^(i|j|k|l|r|lo|hi|low|high|mid|middle|left|right|start|end|idx|index|pos|p|q|m)$/,num=k=>Number.isInteger(v[k]),mk={};
+  sc.filter(k=>PT.test(k)&&num(k)).forEach(k=>{
+    const a=assoc[k]&&arrs.includes(assoc[k])?assoc[k]:arrs[0];
+    if(a&&v[k]>=0&&v[k]<v[a].length){mk[a]=mk[a]||{};(mk[a][v[k]]=mk[a][v[k]]||[]).push(k)}
+  });
+  let range=null;
+  [['low','high'],['lo','hi'],['left','right'],['start','end'],['l','r']].some(([a,b])=>{if(arrs.length&&num(a)&&num(b)){range=[a,b,assoc[a]&&arrs.includes(assoc[a])?assoc[a]:arrs[0]];return true}});
+  const arrH=a=>{const m=mk[a]||{},c=chg(a);return `<div class="an">${a}</div><div class="cells">`+
+    v[a].map((x,i)=>`<div class="c${range&&range[2]===a&&(i<v[range[0]]||i>v[range[1]])?' dim':''}${m[i]?' ptr':''}${c?' chg':''}${ret&&m[i]&&m[i].includes(ret)?' found':''}"><b>${esc(typeof x==='object'?fmt(x):x)}</b><i>${i}</i><u>${m[i]?esc(m[i].join(', ')):''}</u></div>`).join('')+
+    (v[a].length?'':'<span style="color:#888">(empty)</span>')+'</div>'};
+  const args=f.args.length>60?f.args.slice(0,58)+'…':f.args;
+  return `<div class="fr${top?' top':''}"><h3>${esc(f.name)}(<span>${esc(args)}</span>)</h3>${arrs.map(arrH).join('')}<div class="chips">${sc.map(k=>`<span class="chip${chg(k)?' chg':''}"><em>${k}</em> = ${esc(fmt(v[k]))}</span>`).join('')}</div></div>`;
+}
+function treeHTML(n){
+  if(cur<n.start)return '';
+  const done=cur>=n.end,kids=n.kids.filter(k=>rec.has(k.name)).map(treeHTML).join('');
+  const arr=done&&n.res?n.res:n.arr;
+  return `<div class="nd"><div class="nb${done?' done':' act'}">${(arr||[]).map(x=>`<span>${esc(x)}</span>`).join('')}</div>${kids?`<div class="kids">${kids}</div>`:''}</div>`;
+}
+function render(){
+  const s=steps[cur],p=steps[cur-1],view=$('#view');
+  view.querySelectorAll('.ln').forEach(e=>e.classList.toggle('on',+e.dataset.n===s.line));
+  const on=view.querySelector('.on');
+  if(on){const t=on.offsetTop;if(t<view.scrollTop+22||t>view.scrollTop+view.clientHeight-60)view.scrollTop=Math.max(0,t-view.clientHeight/2)}
+  const raw=s.line?lines[s.line-1]:'',cm=raw.match(/\/\/\s*(.*)$/);
+  $('#say').innerHTML=esc(s.msg||(cm?cm[1]:s.line?'Running this line':'Starting…'))+(s.line&&!s.msg?`<small>line ${s.line}: ${esc(strip(raw).trim())}</small>`:'');
+  const fi=s.frames.length-1,tf=s.frames[fi],rm=strip(raw).match(/^\s*return\s+([A-Za-z_$][\w$]*)\s*;?$/);
+  $('#detail').innerHTML='<div class="lab">Right now · '+esc(s.frames.map(f=>f.name).join(' → '))+'</div>'+(Object.keys(tf.vars).length?frameHTML(tf,p&&p.frames.length===s.frames.length?p.frames[fi]:null,true,rm&&rm[1]):'<div class="lab">Nothing to show on this line yet</div>');
+  $('#tree').hidden=!rec.size;
+  if(rec.size)$('#tree').innerHTML='<div class="lab">Big picture · the list is split in halves, then the pieces are joined back in order</div><div class="tr0">'+nodes.filter(n=>!n.parent&&rec.has(n.name)).map(treeHTML).join('')+'</div>';
+  $('#scrub').max=steps.length-1;$('#scrub').value=cur;$('#cnt').textContent=(cur+1)+' / '+steps.length;
+}
+function go(n){cur=Math.max(0,Math.min(steps.length-1,n));render();if(cur===steps.length-1)stop()}
+function stop(){clearInterval(timer);timer=null;$('#play').textContent='▶ Play'}
+function play(){
+  if(timer){stop();return}
+  if(cur>=steps.length-1)cur=0;
+  $('#play').textContent='❚❚ Pause';
+  timer=setInterval(()=>go(cur+1),4200/(+$('#spd').value));
+}
+$('#spd').oninput=()=>{if(timer){stop();play()}};
+function run(){
+  stop();
+  try{execute($('#src').value)}catch(e){
+    $('#tree').hidden=true;$('#detail').innerHTML='<div class="err">'+esc(e.name+': '+e.message)+'</div>';$('#say').textContent='The code could not run. Check it and try again.';return;
+  }
+  $('#view').innerHTML=lines.map((l,i)=>`<div class="ln" data-n="${i+1}"><i>${i+1}</i>${esc(l)||' '}</div>`).join('');
+  $('#view').hidden=false;$('#edit').disabled=false;
+  cur=0;render();
+}
+function gutter(){const n=$('#src').value.split('\n').length;$('#gut').textContent=Array.from({length:n},(_,i)=>i+1).join('\n')}
+$('#src').addEventListener('input',gutter);
+$('#src').addEventListener('scroll',()=>{$('#gut').scrollTop=$('#src').scrollTop});
+$('#run').onclick=run;
+$('#edit').onclick=()=>{stop();$('#view').hidden=true;$('#edit').disabled=true;$('#src').focus()};
+$('#clear').onclick=()=>{stop();$('#view').hidden=true;$('#edit').disabled=true;$('#src').value='';gutter();$('#src').focus()};
+$('#ex').onchange=()=>{$('#src').value=EX[$('#ex').value];gutter();run()};
+$('#first').onclick=()=>{stop();go(0)};
+$('#prev').onclick=()=>{stop();go(cur-1)};
+$('#next').onclick=()=>{stop();go(cur+1)};
+$('#play').onclick=play;
+$('#scrub').oninput=e=>{stop();go(+e.target.value)};
+$('#src').addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const t=e.target,s=t.selectionStart;t.value=t.value.slice(0,s)+'  '+t.value.slice(t.selectionEnd);t.selectionStart=t.selectionEnd=s+2;gutter()}});
+$('#src').value=EX.merge;gutter();run();
+</script>
+</body>
+</html>
