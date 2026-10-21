@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>See how code works: Merge Sort &amp; Binary Search</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:#222;font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+header,main{max-width:1200px;margin:0 auto;padding:0 20px}
+header{padding-top:20px}
+h1{font-size:24px;margin:0 0 4px}
+header p{margin:0;color:#555}
+main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;padding-top:16px;padding-bottom:30px}
+@media(max-width:860px){main{grid-template-columns:1fr}}
+.box{border:2px solid #222;border-radius:8px;background:#fff}
+.title{font-weight:700;padding:8px 12px;border-bottom:2px solid #222;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.title span{flex:1}
+button,select{font:inherit;font-weight:600;background:#fff;color:#222;border:2px solid #222;border-radius:6px;padding:5px 12px;cursor:pointer}
+button.blue{background:#1a73e8;border-color:#1a73e8;color:#fff}
+button.green{background:#2e9e44;border-color:#2e9e44;color:#fff}
+button:disabled{opacity:.35;cursor:default}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button.on{background:#222;color:#fff}
+.ed{height:400px;position:relative;overflow:hidden;display:flex}
+#gut{width:44px;flex:none;background:#f1f1f1;border-right:1px solid #ccc;color:#888;text-align:right;padding:10px 8px 10px 0;overflow:hidden;font:14px/22px ui-monospace,Menlo,Consolas,monospace;white-space:pre}
+#src{flex:1;min-width:0;height:100%;border:0;outline:none;resize:none;padding:10px 12px;font:14px/22px ui-monospace,Menlo,Consolas,monospace;color:#222;background:#fff;white-space:pre;overflow:auto;tab-size:2}
+#view{position:absolute;inset:0;overflow:auto;background:#fff;padding:10px 0;font:14px/22px ui-monospace,Menlo,Consolas,monospace}
+.ln{display:flex;white-space:pre;height:22px;padding-right:12px}
+.ln i{width:44px;flex:none;text-align:right;padding-right:10px;color:#888;font-style:normal}
+.ln.on{background:#fff176;font-weight:700}
+.note{padding:8px 12px;border-top:1px solid #ccc;color:#555;font-size:14px}
+#say{padding:12px 14px;font-size:20px;font-weight:700;height:92px;overflow:auto;border-bottom:2px solid #222}
+#say small{display:block;font-size:13px;font-weight:400;color:#555;font-family:ui-monospace,Menlo,monospace;margin-top:2px}
+#stage{height:440px;display:flex;flex-direction:column;background:#fff}
+#tree{height:228px;overflow:auto;padding:8px 10px;border-bottom:2px dashed #bbb;flex:none}
+#detail{flex:1;overflow:auto;padding:8px 12px}
+.lab{font-size:13px;color:#555;margin-bottom:6px;font-weight:600}
+.tr0{width:max-content;margin:0 auto;display:flex;gap:10px}
+.nd{display:flex;flex-direction:column;align-items:center}
+.kids{display:flex;gap:12px;margin-top:12px}
+.kids>.nd{position:relative}
+.kids>.nd::before{content:"";position:absolute;top:-12px;left:50%;width:2px;height:12px;background:#999}
+.nb{display:flex;gap:2px;border:2px solid #bbb;border-radius:6px;padding:2px;background:#fff}
+.nb.act{border-color:#1a73e8}
+.nb.done{border-color:#2e9e44;background:#d7f5dd}
+.nb.mer{border-color:#f5a000;background:#fff3d6}
+.nb span.blank{color:#ccc}
+.big{font-size:44px;font-weight:700;color:#2e9e44;line-height:1.2}
+.nb span{min-width:24px;text-align:center;font:700 14px ui-monospace,Menlo,monospace;padding:2px 0}
+.c.found b{background:#7bd88f;border-color:#2e9e44}
+.fr{border:1px solid #bbb;border-radius:8px;padding:8px 10px;margin-bottom:10px}
+.fr.top{border:2px solid #1a73e8}
+.fr h3{margin:0 0 6px;font-size:14px;color:#1a73e8;font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+.fr h3 span{color:#666;font-weight:400}
+.an{font-size:13px;color:#555;font-family:ui-monospace,Menlo,monospace;margin-bottom:3px}
+.cells{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.c{width:46px;text-align:center;transition:transform .3s}
+.c b{display:block;border:2px solid #222;border-radius:6px;padding:6px 0;font-size:18px;background:#fff;transition:background .3s,color .3s,border-color .3s}
+.c i{display:block;font-size:11px;color:#888;font-style:normal}
+.c u{display:block;text-decoration:none;font-size:13px;font-weight:700;color:#1a73e8;min-height:18px}
+.c.ptr{transform:translateY(-4px)}
+.c.ptr b{background:#ffd54f}
+.c.dim b{background:#eee;color:#aaa;border-color:#ccc}
+.c.chg b{animation:pop .5s}
+@keyframes pop{0%{background:#7bd88f;transform:scale(1.2)}100%{transform:scale(1)}}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid #bbb;border-radius:6px;padding:1px 9px;font:14px ui-monospace,Menlo,monospace}
+.chip em{font-style:normal;color:#666}
+.chip.chg{animation:pop .5s}
+.ctl{display:flex;gap:8px;align-items:center;padding:10px 12px;border-top:2px solid #222;flex-wrap:wrap}
+#scrub{flex:1;min-width:110px;accent-color:#1a73e8}
+#spd{accent-color:#1a73e8}
+.legend{padding:8px 12px;border-top:1px solid #ccc;font-size:14px;color:#444;display:flex;gap:14px;flex-wrap:wrap}
+.legend b{display:inline-block;width:14px;height:14px;border:2px solid #222;border-radius:3px;vertical-align:-2px;margin-right:4px}
+.err{color:#c62828;white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:14px}
+</style>
+</head>
+<body>
+<header>
+<h1>See how code works</h1>
+<p>1) Pick an example or type your own code. 2) Press the green button. 3) Press Play and watch each line happen.</p>
+</header>
+<main>
+<section class="box">
+<div class="title"><span>Language:</span><div class="seg" id="langs"><button data-l="js">JavaScript</button><button data-l="python">Python</button><button data-l="c">C</button><button data-l="cpp">C++</button><button data-l="java">Java</button></div></div>
+<div class="title" style="border-top:0"><span>Your code</span>
+<select id="ex"><option value="merge">Example: Merge sort</option><option value="bin">Example: Binary search</option></select></div>
+<div class="ed"><div id="gut"></div><textarea id="src" spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" placeholder="Type or paste your code here"></textarea><div id="view" hidden></div></div>
+<div class="ctl" style="border-top:2px solid #222">
+<button class="green" id="run">▶ Run &amp; show me</button>
+<button id="edit" disabled>✎ Edit code</button>
+<button id="clear">Clear</button>
+</div>
+<div class="note">Pick your language and paste your code as it is. It works best with basic code: functions, if / while / for, and lists or arrays. Call your function at the bottom (or use <code>main</code>). Comments (<code>//</code> or <code>#</code>) are shown as the explanation.</div>
+</section>
+<section class="box">
+<div id="say">Press the green button to start.</div>
+<div id="stage"><div id="tree"></div><div id="detail"></div></div>
+<div class="legend"><span><b style="background:#ffd54f"></b>being looked at</span><span><b style="background:#eee;border-color:#ccc"></b>ignored for now</span><span><b style="background:#7bd88f"></b>just changed / found / sorted</span></div>
+<div class="ctl">
+<button id="first">⏮ Start</button>
+<button id="prev">◀ Back</button>
+<button class="blue" id="play">▶ Play</button>
+<button id="next">Next ▶</button>
+<input type="range" id="scrub" min="0" max="0" value="0" aria-label="Step">
+<span id="cnt">0 / 0</span>
+<label>Speed <input type="range" id="spd" min="1" max="10" value="3"></label>
+</div>
+</section>
+</main>
+<script>
+const EXJS={
+merge:`// WHAT THIS CODE DOES: Merge sort puts numbers in order (smallest first).
+// HOW: split the list in halves until each piece is 1 number,
+// then join the pieces back together in order.
+// OUTPUT: [5, 2, 8, 1, 9, 3] becomes [1, 2, 3, 5, 8, 9]
+function mergeSort(list) {
+  if (list.length <= 1) return list; // one number is already sorted
+  const middle = Math.floor(list.length / 2); // find the middle
+  const left = mergeSort(list.slice(0, middle)); // sort the left half
+  const right = mergeSort(list.slice(middle)); // sort the right half
+  return merge(left, right); // join both halves in order
+}
+
+function merge(left, right) {
+  const result = []; // the new sorted list
+  let i = 0; // our place in left
+  let j = 0; // our place in right
+  while (i < left.length && j < right.length) { // until one side runs out
+    if (left[i] <= right[j]) { // which front number is smaller?
+      result.push(left[i]); // left is smaller, take it
+      i++; // move one step right in left
+    } else {
+      result.push(right[j]); // right is smaller, take it
+      j++; // move one step right in right
+    }
+  }
+  return result.concat(left.slice(i), right.slice(j)); // add what is left over
+}
+
+mergeSort([5, 2, 8, 1, 9, 3]); // start with 6 numbers`,
+bin:`// WHAT THIS CODE DOES: Binary search finds where a number is in a SORTED list.
+// HOW: look at the middle, throw away the half that cannot have it, repeat.
+// OUTPUT: 23 is found at position 4 (counting from 0)
+function binarySearch(list, target) {
+  let low = 0; // start of the search area
+  let high = list.length - 1; // end of the search area
+  while (low <= high) { // keep going while there is something to search
+    const mid = Math.floor((low + high) / 2); // look at the middle
+    if (list[mid] === target) { // is the middle the number we want?
+      return mid; // yes, we found it!
+    } else if (list[mid] < target) { // the middle is too small
+      low = mid + 1; // throw away the left side
+    } else { // the middle is too big
+      high = mid - 1; // throw away the right side
+    }
+  }
+  return -1; // it is not in the list
+}
+
+binarySearch([3, 8, 12, 17, 23, 31, 45, 52], 23); // look for 23`};
+const EXS={js:EXJS,
+python:{
+merge:`# WHAT: Merge sort puts numbers in order (smallest first).
+# OUTPUT: [5, 2, 8, 1, 9, 3] becomes [1, 2, 3, 5, 8, 9]
+def merge_sort(numbers):
+    if len(numbers) <= 1:  # one number is already sorted
+        return numbers
+
+    middle = len(numbers) // 2  # find the middle
+    left_half = merge_sort(numbers[:middle])  # sort the left half
+    right_half = merge_sort(numbers[middle:])  # sort the right half
+
+    sorted_list = []  # the new sorted list
+    while len(left_half) > 0 and len(right_half) > 0:  # until one side is empty
+        if left_half[0] < right_half[0]:  # which front number is smaller?
+            sorted_list.append(left_half[0])  # take it from the left
+            left_half.pop(0)
+        else:
+            sorted_list.append(right_half[0])  # take it from the right
+            right_half.pop(0)
+
+    sorted_list = sorted_list + left_half + right_half  # add what is left over
+    return sorted_list
+
+print(merge_sort([5, 2, 8, 1, 9, 3]))  # start with 6 numbers`,
+bin:`# WHAT: Binary search finds a number in a SORTED list.
+# OUTPUT: 23 is found at position 4 (counting from 0)
+def binary_search(numbers, target):
+    low = 0  # start of the search area
+    high = len(numbers) - 1  # end of the search area
+    while low <= high:  # keep going while there is something to search
+        mid = (low + high) // 2  # look at the middle
+        if numbers[mid] == target:  # is the middle the number we want?
+            return mid  # yes, found it!
+        elif numbers[mid] < target:  # the middle is too small
+            low = mid + 1  # throw away the left side
+        else:  # the middle is too big
+            high = mid - 1  # throw away the right side
+    return -1  # it is not in the list
+
+print(binary_search([3, 8, 12, 17, 23, 31, 45, 52], 23))  # look for 23`},
+c:{
+merge:`// WHAT: Merge sort puts numbers in order (smallest first).
+// OUTPUT: 5 2 8 1 9 3 becomes 1 2 3 5 8 9
+#include <stdio.h>
+
+void merge(int arr[], int start, int middle, int end) {
+  int temp[10]; // helper list
+  int i = start; // place in left half
+  int j = middle + 1; // place in right half
+  int k = 0; // place in helper
+  while (i <= middle && j <= end) { // until one half runs out
+    if (arr[i] <= arr[j]) { // which front number is smaller?
+      temp[k] = arr[i]; // take from left
+      i++;
+    } else {
+      temp[k] = arr[j]; // take from right
+      j++;
+    }
+    k++;
+  }
+  while (i <= middle) { // copy what is left in the left half
+    temp[k] = arr[i];
+    i++;
+    k++;
+  }
+  while (j <= end) { // copy what is left in the right half
+    temp[k] = arr[j];
+    j++;
+    k++;
+  }
+  for (k = 0; k < end - start + 1; k++) { // copy back into the list
+    arr[start + k] = temp[k];
+  }
+}
+
+void mergeSort(int arr[], int start, int end) {
+  if (start >= end) return; // one number is already sorted
+  int middle = (start + end) / 2; // find the middle
+  mergeSort(arr, start, middle); // sort the left half
+  mergeSort(arr, middle + 1, end); // sort the right half
+  merge(arr, start, middle, end); // join both halves
+}
+
+int main() {
+  int numbers[6] = {5, 2, 8, 1, 9, 3}; // start with 6 numbers
+  mergeSort(numbers, 0, 5);
+  return 0;
+}`,
+bin:`// WHAT: Binary search finds a number in a SORTED list.
+// OUTPUT: 23 is found at position 4 (counting from 0)
+#include <stdio.h>
+
+int binarySearch(int list[], int size, int target) {
+  int low = 0; // start of the search area
+  int high = size - 1; // end of the search area
+  while (low <= high) { // keep going while there is something to search
+    int mid = (low + high) / 2; // look at the middle
+    if (list[mid] == target) { // is the middle the number we want?
+      return mid; // yes, found it!
+    } else if (list[mid] < target) { // the middle is too small
+      low = mid + 1; // throw away the left side
+    } else { // the middle is too big
+      high = mid - 1; // throw away the right side
+    }
+  }
+  return -1; // it is not in the list
+}
+
+int main() {
+  int numbers[8] = {3, 8, 12, 17, 23, 31, 45, 52};
+  binarySearch(numbers, 8, 23); // look for 23
+  return 0;
+}`},
+java:{
+merge:`// WHAT: Merge sort puts numbers in order (smallest first).
+// OUTPUT: [5, 2, 8, 1, 9, 3] becomes [1, 2, 3, 5, 8, 9]
+public class Main {
+  static int[] mergeSort(int[] list) {
+    if (list.length <= 1) return list; // one number is already sorted
+    int middle = list.length / 2; // find the middle
+    int[] left = mergeSort(Arrays.copyOfRange(list, 0, middle)); // sort the left half
+    int[] right = mergeSort(Arrays.copyOfRange(list, middle, list.length)); // sort the right half
+    return merge(left, right); // join both halves
+  }
+
+  static int[] merge(int[] left, int[] right) {
+    int[] result = new int[left.length + right.length]; // the new list
+    int i = 0; // place in left
+    int j = 0; // place in right
+    int k = 0; // place in result
+    while (i < left.length && j < right.length) { // until one side runs out
+      if (left[i] <= right[j]) { // which front number is smaller?
+        result[k++] = left[i++]; // take it from the left
+      } else {
+        result[k++] = right[j++]; // take it from the right
+      }
+    }
+    while (i < left.length) result[k++] = left[i++]; // copy what is left
+    while (j < right.length) result[k++] = right[j++];
+    return result;
+  }
+
+  public static void main(String[] args) {
+    mergeSort(new int[]{5, 2, 8, 1, 9, 3}); // start with 6 numbers
+  }
+}`,
+bin:`// WHAT: Binary search finds a number in a SORTED list.
+// OUTPUT: 23 is found at position 4 (counting from 0)
+public class Main {
+  static int binarySearch(int[] list, int target) {
+    int low = 0; // start of the search area
+    int high = list.length - 1; // end of the search area
+    while (low <= high) { // keep going while there is something to search
+      int mid = (low + high) / 2; // look at the middle
+      if (list[mid] == target) { // is the middle the number we want?
+        return mid; // yes, found it!
+      } else if (list[mid] < target) { // the middle is too small
+        low = mid + 1; // throw away the left side
+      } else { // the middle is too big
+        high = mid - 1; // throw away the right side
+      }
+    }
+    return -1; // it is not in the list
+  }
+
+  public static void main(String[] args) {
+    binarySearch(new int[]{3, 8, 12, 17, 23, 31, 45, 52}, 23); // look for 23
+  }
+}`}};
+
+EXS.cpp={
+merge:`// WHAT: Merge sort puts numbers in order (smallest first).
+// OUTPUT: [5, 2, 8, 1, 9, 3] becomes [1, 2, 3, 5, 8, 9]
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<int> merge(vector<int> left, vector<int> right) {
+  vector<int> result; // the new sorted list
+  int i = 0; // place in left
+  int j = 0; // place in right
+  while (i < left.size() && j < right.size()) { // until one side runs out
+    if (left[i] <= right[j]) { // which front number is smaller?
+      result.push_back(left[i]); // take it from the left
+      i++;
+    } else {
+      result.push_back(right[j]); // take it from the right
+      j++;
+    }
+  }
+  while (i < left.size()) { // copy what is left on the left
+    result.push_back(left[i]);
+    i++;
+  }
+  while (j < right.size()) { // copy what is left on the right
+    result.push_back(right[j]);
+    j++;
+  }
+  return result;
+}
+
+vector<int> mergeSort(vector<int> list) {
+  if (list.size() <= 1) return list; // one number is already sorted
+  int middle = list.size() / 2; // find the middle
+  vector<int> left(list.begin(), list.begin() + middle); // left half
+  vector<int> right(list.begin() + middle, list.end()); // right half
+  left = mergeSort(left); // sort the left half
+  right = mergeSort(right); // sort the right half
+  return merge(left, right); // join both halves
+}
+
+int main() {
+  vector<int> numbers = {5, 2, 8, 1, 9, 3}; // start with 6 numbers
+  mergeSort(numbers);
+  return 0;
+}`,
+bin:`// WHAT: Binary search finds a number in a SORTED list.
+// OUTPUT: 23 is found at position 4 (counting from 0)
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int binarySearch(vector<int> list, int target) {
+  int low = 0; // start of the search area
+  int high = list.size() - 1; // end of the search area
+  while (low <= high) { // keep going while there is something to search
+    int mid = (low + high) / 2; // look at the middle
+    if (list[mid] == target) { // is the middle the number we want?
+      return mid; // yes, found it!
+    } else if (list[mid] < target) { // the middle is too small
+      low = mid + 1; // throw away the left side
+    } else { // the middle is too big
+      high = mid - 1; // throw away the right side
+    }
+  }
+  return -1; // it is not in the list
+}
+
+int main() {
+  vector<int> numbers = {3, 8, 12, 17, 23, 31, 45, 52};
+  binarySearch(numbers, 23); // look for 23
+  return 0;
+}`};
+
+// ---- Translate Python / C / Java into JavaScript (same number of lines) so the tracer can run it ----
+function splitTop(s){const o=[];let d=0,c='';for(const ch of s){if('([{'.includes(ch))d++;if(')]}'.includes(ch))d--;if(ch===','&&!d){o.push(c);c=''}else c+=ch}o.push(c);return o}
+function convDecl(rest,ty){
+  return 'let '+splitTop(rest.replace(/;\s*$/,'')).map(p=>{
+    const m=p.match(/^\s*\*?\s*(\w+)\s*\[([^\]]*)\]\s*(?:=\s*([\s\S]*))?$/);
+    if(!m){const q=p.trim().replace(/^[*&]\s*/,'');if(/^(?:vector|List|ArrayList)$/.test(ty)&&/^\w+$/.test(q))return q+' = []';return q.replace(/=\s*\{([\s\S]*)\}\s*$/,'= [$1]')}
+    return m[1]+' = '+(m[3]!==undefined?m[3].trim().replace(/^\{([\s\S]*)\}$/,'[$1]'):'new Array('+(m[2]||0)+').fill(0)');
+  }).join(', ')+';';
+}
+const pyE=s=>s.replace(/\bTrue\b/g,'true').replace(/\bFalse\b/g,'false').replace(/\bNone\b/g,'null').replace(/\band\b/g,'&&').replace(/\bor\b/g,'||').replace(/\bnot\s+/g,'!')
+ .replace(/\blen\((\w+)\)/g,'$1.length').replace(/(\([^()]*\)|[\w.]+)\s*\/\/\s*(\([^()]*\)|[\w.]+)/g,'Math.floor($1 / $2)')
+ .replace(/(\w+)\[([^\[\]:]*):([^\[\]:]*)\]/g,(m,a,x,y)=>a+'.slice('+(x.trim()||0)+(y.trim()?', '+y.trim():'')+')')
+ .replace(/\.append\(/g,'.push(').replace(/\.pop\(0\)/g,'.shift()')
+ .replace(/(?<![\w.])[A-Za-z_]\w*(?:\s*\+\s*[A-Za-z_]\w*)+/g,m=>'__add('+m.split('+').map(x=>x.trim()).join(',')+')');
+const cE=s=>s.replace(/(\w+)\(\s*(\w+)\.begin\(\)\s*,\s*\2\.begin\(\)\s*\+\s*([^)]+?)\s*\)/g,'$1 = $2.slice(0, $3)').replace(/(\w+)\(\s*(\w+)\.begin\(\)\s*\+\s*([^,]+?)\s*,\s*\2\.end\(\)\s*\)/g,'$1 = $2.slice($3)').replace(/\.push_back\(/g,'.push(').replace(/\bnew\s+\w+\s*\[\s*\]\s*\{([^}]*)\}/g,'[$1]').replace(/\bnew\s+(?:int|long|double|float|char|boolean)\s*\[([^\]]+)\]/g,'new Array($1).fill(0)').replace(/new\s+(?:Array)?List<[^>]*>\(\)/g,'[]')
+ .replace(/Arrays\.copyOfRange\(\s*(\w+)\s*,\s*([^,]+),\s*([^)]+)\)/g,'$1.slice($2, $3)').replace(/\.size\(\)/g,'.length').replace(/\.add\(/g,'.push(').replace(/\.get\(([^)]*)\)/g,'[$1]').replace(/\.remove\(0\)/g,'.shift()')
+ .replace(/System\.out\.print(?:ln)?\(|\bprintf\(/g,'print(').replace(/sizeof\((\w+)\)\s*\/\s*sizeof\(\w+\[0\]\)/g,'$1.length').replace(/\(\s*(?:int|long)\s*\)\s*/g,'')
+ .replace(/(\([^()]*\)|[\w.]+)\s*\/\s*(\([^()]*\)|\w+)/g,'Math.trunc($1 / $2)');
+const TY='int|long|short|byte|double|float|char|boolean|bool|String|size_t|var|List|ArrayList|vector';
+const FN=new RegExp('^(?:(?:public|private|protected|static|final|inline|unsigned)\\s+)*(?:void|'+TY+')(?:\\s*<[^>]*>)?(?:\\[\\])*\\s*[&*]*\\s*(\\w+)\\s*\\(([^)]*)\\)\\s*(?:throws\\s+\\w+\\s*)?\\{$');
+const DECL=new RegExp('^(?:(?:final|const|static|unsigned)\\s+)*('+TY+')(?:\\s*<[^>]*>)?(?:\\[\\])*[&*]?\\s+([\\s\\S]*)$');
+function translate(src,L){
+  if(L==='js')return src;
+  const cp=[],cm=[];
+  src.split('\n').forEach(l=>{const m=l.match(L==='python'?/^(.*?)(\s*#.*)?$/:/^(.*?)(\s*\/\/.*)?$/);cp.push(m[1]);cm.push(m[2]?m[2].replace(/^(\s*)#/,'$1//'):'')});
+  const o=cp.map(()=>''),n=cp.length;let last=-1,m;
+  if(L==='python'){
+    const ind=cp.map(c=>c.trim()?c.match(/^\s*/)[0].length:-1),fv={},stack=[0];
+    const nextInd=i=>{let j=i+1;while(j<n&&ind[j]<0)j++;return j<n?ind[j]:0};
+    cp.forEach((c,i)=>{const d=c.match(/^\s*def\s+(\w+)\s*\(([^)]*)\)\s*:/);if(!d)return;
+      const ps=d[2].split(',').map(x=>x.trim().split('=')[0].trim()),vs=new Set();
+      for(let j=i+1;j<n&&(ind[j]<0||ind[j]>ind[i]);j++){const a=cp[j].match(/^\s*([A-Za-z_]\w*)\s*[-+*\/]?=(?!=)/);if(a&&!ps.includes(a[1]))vs.add(a[1])}
+      fv[i]=[...vs]});
+    cp.forEach((c,i)=>{
+      if(ind[i]<0)return;
+      while(ind[i]<stack[stack.length-1]){stack.pop();o[last]+=' }'}
+      let t=c.trim(),open=false;
+      if(m=t.match(/^def\s+(\w+)\s*\(([^)]*)\)\s*:$/)){t=`function ${m[1]}(${m[2]}) {`+(fv[i].length?` let ${fv[i].join(', ')};`:'');open=true}
+      else if(m=t.match(/^(if|elif|while)\s+(.*?)\s*:\s*(\S.*)?$/)){const kw=m[1]==='elif'?'else if':m[1];if(m[3])t=`${kw} (${pyE(m[2])}) { ${pyE(m[3])} }`;else{t=`${kw} (${pyE(m[2])}) {`;open=true}}
+      else if(/^else\s*:$/.test(t)){t='else {';open=true}
+      else if(m=t.match(/^for\s+(\w+)\s+in\s+range\((.*)\)\s*:$/)){const a=splitTop(m[2]).map(x=>pyE(x.trim())),b=a.length>1;t=`for (let ${m[1]} = ${b?a[0]:0}; ${m[1]} < ${b?a[1]:a[0]}; ${m[1]}++) {`;open=true}
+      else if(m=t.match(/^for\s+(\w+)\s+in\s+(.*)\s*:$/)){t=`for (const ${m[1]} of ${pyE(m[2])}) {`;open=true}
+      else t=pyE(t);
+      o[i]=t;last=i;
+      if(open&&nextInd(i)>ind[i])stack.push(nextInd(i));
+    });
+    while(stack.length>1){stack.pop();o[last]+=' }'}
+  }else{
+    let bal=null,hasMain=false;
+    cp.forEach((c,i)=>{
+      let t=c.trim();
+      if(/^(#include|#define|using\s|import\s|package\s)/.test(t))t='';
+      else if(L==='java'&&bal===null&&/\bclass\s+\w+\s*\{$/.test(t)){t='';bal=0}
+      else{
+        if(bal!==null){if(bal===0&&t==='}')t='';else bal+=(t.match(/\{/g)||[]).length-(t.match(/\}/g)||[]).length}
+        if(t){
+          if(/^(?:std::)?(?:cout|cerr)\b/.test(t))t='print();';else if(m=t.match(FN)){const ps=m[2].split(',').map(x=>(x.match(/(\w+)\s*(?:\[\s*\d*\s*\])*\s*$/)||[,''])[1]).filter(Boolean);if(m[1]==='main')hasMain=true;t=`function ${m[1]}(${ps.join(', ')}) {`}
+          else if(m=t.match(DECL))t=convDecl(cE(m[2]),m[1]);
+          else t=cE(t.replace(new RegExp('\\bfor\\s*\\(\\s*(?:'+TY+')\\s+'),'for (let '));
+        }
+      }
+      o[i]=t;if(t)last=i;
+    });
+    if(hasMain)o[last]+=';main([]);';
+  }
+  return o.map((t,i)=>t+cm[i]).join('\n');
+}
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const stripJS=l=>l.replace(/\s*\/\/.*$/,'');
+const strip=l=>l.replace(lang==='python'?/\s*#.*$/:/\s*\/\/.*$/,'');
+let steps=[],cur=0,timer=null,assoc={},lines=[],nodes=[],rec=new Set(),lang='js',FP={},LV=null,finalVal,finalArr=null,inputArr=null;
+function fmt(x){
+  if(Array.isArray(x))return '['+x.slice(0,10).map(fmt).join(', ')+(x.length>10?', …':'')+']';
+  if(typeof x==='string')return JSON.stringify(x);
+  if(typeof x==='function')return 'ƒ';
+  if(x&&typeof x==='object'){try{return JSON.stringify(x)}catch(e){return '{…}'}}
+  return String(x);
+}
+function clone(o){const r={};for(const k in o){const v=o[k];if(typeof v==='function')continue;r[k]=Array.isArray(v)?v.slice(0,40):(v&&typeof v==='object')?fmt(v):v}return r}
+
+function build(src){
+  FP={};const L=src.split('\n').map(stripJS),names=new Set(),fn=new Set(),as={};
+  const O=src.split('\n');
+  L.join('\n').replace(/function\s*([\w$]+)\s*\(([^)]*)\)/g,(m,n,p)=>{fn.add(n);FP[n]=p.split(',').map(x=>x.split('=')[0].trim());p.split(',').forEach(x=>{x=x.split('=')[0].trim();if(/^[\w$]+$/.test(x))names.add(x)});return m});
+  L.forEach(l=>{const m=l.match(/\b(?:let|const|var)\s+(.*)/);if(m)m[1].split(/;|\bof\b|\bin\b/)[0].replace(/(?:^|,)\s*([A-Za-z_$][\w$]*)\s*(?:=|$)/g,(a,n)=>{names.add(n);return a})});
+  fn.forEach(n=>names.delete(n));
+  L.join('\n').replace(/([A-Za-z_$][\w$]*)\[\s*([A-Za-z_$][\w$]*)(?:\s*[+-]\s*\d+)?\s*\]/g,(m,a,i)=>{if(!as[i])as[i]=a;return m});
+  const g='()=>{const o={};'+[...names].map(n=>`try{o.${n}=${n}}catch(e){}`).join('')+'return o}';
+  const out=[];let prev='';
+  L.forEach((l,i)=>{
+    const t=l.trim();
+    const skip=!t||/^(\/\/|[})\]]|else\b|case\b|default\b|catch\b|finally\b|function\b|[.,+\-*\/%&|?:])/.test(t)||/[,(\[+\-*\/%&|?:=]$/.test(prev)||/^(if|else if|for|while)\b.*\)$/.test(prev)||/^else$/.test(prev);
+    out.push(skip?O[i]:O[i].replace(/^(\s*)/,(m,a)=>a+`__s(${i+1},${g});`));
+    if(t)prev=t;
+  });
+  out[0]=[...fn].map(n=>`${n}=__w(${n},"${n}");`).join('')+out[0];
+  return {code:out.join('\n'),assoc:as};
+}
+function execute(src){
+  const b=build(translate(src,lang));assoc=b.assoc;steps=[];lines=src.split('\n');
+  let count=0;nodes=[];rec=new Set();const nst=[];let fin;const frames=[{name:'start',args:'',vars:{},line:0}];
+  const push=(line,msg)=>steps.push({line,msg,frames:frames.slice(-4).map(f=>({name:f.name,args:f.args,vars:f.vars}))});
+  const __s=(line,get)=>{
+    if(++count>2500)throw new Error('Stopped after 2500 steps. Is there a loop that never ends?');
+    let v={};try{v=get()}catch(e){}
+    const f=frames[frames.length-1];f.vars=clone(v);f.line=line;push(line,'');
+  };
+  const __w=(f,name)=>function(...a){
+    const n={name,parent:nst[nst.length-1]||null,arr:Array.isArray(a[0])?a[0].slice(0,12):null,res:null,start:steps.length,end:1e9,kids:[]};
+    if(n.parent)n.parent.kids.push(n);nodes.push(n);nst.push(n);
+    frames.push({name,args:a.map(fmt).join(', '),vars:{},line:0});
+    let r;try{r=f.apply(this,a)}finally{frames.pop();nst.pop()}
+    n.end=steps.length;n.res=Array.isArray(r)?r.slice(0,12):null;
+    if(name!=='main'&&(frames.length===1||(frames.length===2&&frames[1].name==='main')))fin=r;
+    push(frames[frames.length-1].line,'Done! '+name+' gives back '+fmt(r));return r;
+  };
+  new Function('__s','__w','__add','print',b.code)(__s,__w,(...x)=>x.some(Array.isArray)?[].concat(...x):x.reduce((a,c)=>a+c),()=>{});
+  rec=new Set(nodes.filter(n=>n.parent&&n.parent.name===n.name&&n.arr&&n.res).map(n=>n.name));
+  finalVal=fin;finalArr=Array.isArray(fin)?fin.slice(0,40):null;inputArr=(nodes.find(n=>n.arr&&n.res)||{}).arr||null;
+  if(fin===undefined){
+    for(let i=steps.length-1;i>=0&&!finalArr;i--){const f=steps[i].frames.find(f=>f.name==='main');if(f)finalArr=Object.values(f.vars).find(Array.isArray)||null}
+    for(let i=0;i<steps.length&&!inputArr&&finalArr;i++){const f=steps[i].frames.find(f=>f.name==='main');if(f)inputArr=Object.values(f.vars).find(Array.isArray)||null}
+  }
+  push(frames[0].line,fin===undefined?'All finished!':'All finished! The answer is '+fmt(fin));
+}
+
+function frameHTML(f,pf,top,ret){
+  const v=f.vars,keys=Object.keys(v),arrs=keys.filter(k=>Array.isArray(v[k])),sc=keys.filter(k=>!Array.isArray(v[k]));
+  const chg=k=>pf&&pf.name===f.name&&JSON.stringify(pf.vars[k])!==JSON.stringify(v[k]);
+  const PT=/^(i|j|k|l|r|lo|hi|low|high|mid|middle|left|right|start|end|idx|index|pos|p|q|m)$/,num=k=>Number.isInteger(v[k]),mk={};
+  sc.filter(k=>PT.test(k)&&num(k)).forEach(k=>{
+    const a=assoc[k]&&arrs.includes(assoc[k])?assoc[k]:arrs[0];
+    if(a&&v[k]>=0&&v[k]<v[a].length){mk[a]=mk[a]||{};(mk[a][v[k]]=mk[a][v[k]]||[]).push(k)}
+  });
+  let range=null;
+  [['low','high'],['lo','hi'],['left','right'],['start','end'],['l','r']].some(([a,b])=>{if(arrs.length&&num(a)&&num(b)){range=[a,b,assoc[a]&&arrs.includes(assoc[a])?assoc[a]:arrs[0]];return true}});
+  const arrH=a=>{const m=mk[a]||{},c=chg(a);return `<div class="an">${a}</div><div class="cells">`+
+    v[a].map((x,i)=>`<div class="c${range&&range[2]===a&&(i<v[range[0]]||i>v[range[1]])?' dim':''}${m[i]?' ptr':''}${c?' chg':''}${ret&&m[i]&&m[i].includes(ret)?' found':''}"><b>${esc(typeof x==='object'?fmt(x):x)}</b><i>${i}</i><u>${m[i]?esc(m[i].join(', ')):''}</u></div>`).join('')+
+    (v[a].length?'':'<span style="color:#888">(empty)</span>')+'</div>'};
+  const args=f.args.length>60?f.args.slice(0,58)+'…':f.args;
+  return `<div class="fr${top?' top':''}"><h3>${esc(f.name)}(<span>${esc(args)}</span>)</h3>${arrs.map(arrH).join('')}<div class="chips">${sc.map(k=>`<span class="chip${chg(k)?' chg':''}"><em>${k}</em> = ${esc(fmt(v[k]))}</span>`).join('')}</div></div>`;
+}
+function treeHTML(n){
+  if(cur<n.start)return '';
+  const done=cur>=n.end,kids=n.kids.filter(k=>rec.has(k.name)).map(treeHTML).join('');
+  const mer=!done&&LV&&LV.node===n;
+  let cells;
+  if(done&&n.res)cells=n.res.map(x=>`<span>${esc(x)}</span>`).join('');
+  else if(mer){const tot=Math.max(n.arr.length,LV.arr.length);cells=LV.arr.map(x=>`<span>${esc(x)}</span>`).join('')+Array(Math.max(0,tot-LV.arr.length)).fill('<span class="blank">_</span>').join('')}
+  else cells=(n.arr||[]).map(x=>`<span>${esc(x)}</span>`).join('');
+  return `<div class="nd"><div class="nb${done?' done':mer?' mer':' act'}">${cells}</div>${kids?`<div class="kids">${kids}</div>`:''}</div>`;
+}
+function showFinal(){
+  const cells=(a,g)=>'<div class="cells">'+a.map(x=>`<div class="c${g?' found':''}"><b>${esc(x)}</b></div>`).join('')+'</div>';
+  let h='<div class="lab">Final output</div>';
+  if(finalArr&&inputArr)h+='<div class="an">Before</div>'+cells(inputArr,false)+'<div class="an">After (sorted)</div>'+cells(finalArr,true);
+  else if(finalArr)h+=cells(finalArr,true);
+  else if(finalVal!==undefined)h+='<div class="big">'+esc(fmt(finalVal))+'</div>';
+  else return;
+  $('#detail').innerHTML=h;
+}
+function render(){
+  const s=steps[cur],p=steps[cur-1],view=$('#view');
+  view.querySelectorAll('.ln').forEach(e=>e.classList.toggle('on',+e.dataset.n===s.line));
+  const on=view.querySelector('.on');
+  if(on){const t=on.offsetTop;if(t<view.scrollTop+22||t>view.scrollTop+view.clientHeight-60)view.scrollTop=Math.max(0,t-view.clientHeight/2)}
+  const raw=s.line?lines[s.line-1]:'',cm=raw.match(lang==='python'?/#\s*(.*)$/:/\/\/\s*(.*)$/);
+  $('#say').innerHTML=esc(s.msg||(cm?cm[1]:s.line?'Running this line':'Starting…'))+(s.line&&!s.msg?`<small>line ${s.line}: ${esc(strip(raw).trim())}</small>`:'');
+  const fi=s.frames.length-1,tf=s.frames[fi],rm=strip(raw).match(/^\s*return\s+([A-Za-z_$][\w$]*)\s*;?$/);
+  $('#detail').innerHTML='<div class="lab">Right now · '+esc(s.frames.map(f=>f.name).join(' → '))+'</div>'+(Object.keys(tf.vars).length?frameHTML(tf,p&&p.frames.length===s.frames.length?p.frames[fi]:null,true,rm&&rm[1]):'<div class="lab">Nothing to show on this line yet</div>');
+  LV=null;
+  if(rec.size){
+    const act=nodes.filter(n=>rec.has(n.name)&&cur>=n.start&&cur<n.end).sort((a,b)=>b.start-a.start),A=act[0],rk=A?A.kids.filter(k=>rec.has(k.name)):[];
+    if(A&&rk.length&&rk.every(k=>cur>=k.end)){
+      const vs=tf.vars,ps=FP[tf.name]||[];
+      const ks=Object.keys(vs).filter(k=>Array.isArray(vs[k])&&!ps.includes(k)&&(tf.name!==A.name||/result|merg|sort|temp|out|ans|res|new|final/i.test(k)));
+      let w=ks.length?vs[ks[ks.length-1]]:[];
+      if(Number.isInteger(vs.k)&&w.length>vs.k)w=w.slice(0,vs.k);
+      LV={node:A,arr:w};
+    }
+  }
+  $('#tree').hidden=!rec.size;
+  if(rec.size)$('#tree').innerHTML='<div class="lab">Big picture · the list is split in halves, then the pieces are joined back in order</div><div class="tr0">'+nodes.filter(n=>rec.has(n.name)&&!(n.parent&&rec.has(n.parent.name))).map(treeHTML).join('')+'</div>';
+  if(cur===steps.length-1)showFinal();
+  $('#scrub').max=steps.length-1;$('#scrub').value=cur;$('#cnt').textContent=(cur+1)+' / '+steps.length;
+}
+function go(n){cur=Math.max(0,Math.min(steps.length-1,n));render();if(cur===steps.length-1)stop()}
+function stop(){clearInterval(timer);timer=null;$('#play').textContent='▶ Play'}
+function play(){
+  if(timer){stop();return}
+  if(cur>=steps.length-1)cur=0;
+  $('#play').textContent='❚❚ Pause';
+  timer=setInterval(()=>go(cur+1),4200/(+$('#spd').value));
+}
+$('#spd').oninput=()=>{if(timer){stop();play()}};
+function run(){
+  stop();
+  try{execute($('#src').value)}catch(e){
+    $('#tree').hidden=true;$('#detail').innerHTML='<div class="err">'+esc(e.name+': '+e.message)+'</div>';$('#say').textContent='The code could not run. Check it and try again.';return;
+  }
+  $('#view').innerHTML=lines.map((l,i)=>`<div class="ln" data-n="${i+1}"><i>${i+1}</i>${esc(l)||' '}</div>`).join('');
+  $('#view').hidden=false;$('#edit').disabled=false;
+  cur=0;render();
+}
+function gutter(){const n=$('#src').value.split('\n').length;$('#gut').textContent=Array.from({length:n},(_,i)=>i+1).join('\n')}
+$('#src').addEventListener('input',gutter);
+$('#src').addEventListener('scroll',()=>{$('#gut').scrollTop=$('#src').scrollTop});
+$('#run').onclick=run;
+$('#edit').onclick=()=>{stop();$('#view').hidden=true;$('#edit').disabled=true;$('#src').focus()};
+$('#clear').onclick=()=>{stop();$('#view').hidden=true;$('#edit').disabled=true;$('#src').value='';gutter();$('#src').focus()};
+$('#ex').onchange=()=>{$('#src').value=EXS[lang][$('#ex').value];gutter();run()};
+function setLang(l,force){
+  lang=l;document.querySelectorAll('#langs button').forEach(b=>b.classList.toggle('on',b.dataset.l===l));
+  const v=$('#src').value,isEx=!v.trim()||Object.values(EXS).some(o=>Object.values(o).includes(v));
+  if(force||isEx){$('#src').value=EXS[l][$('#ex').value];gutter()}
+  run();
+}
+document.querySelectorAll('#langs button').forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+$('#first').onclick=()=>{stop();go(0)};
+$('#prev').onclick=()=>{stop();go(cur-1)};
+$('#next').onclick=()=>{stop();go(cur+1)};
+$('#play').onclick=play;
+$('#scrub').oninput=e=>{stop();go(+e.target.value)};
+$('#src').addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();const t=e.target,s=t.selectionStart;t.value=t.value.slice(0,s)+'  '+t.value.slice(t.selectionEnd);t.selectionStart=t.selectionEnd=s+2;gutter()}});
+setLang('js',true);
+</script>
+</body>
+</html>
